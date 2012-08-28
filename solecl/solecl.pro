@@ -16,10 +16,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    gauss.cpp
+    gauss.cpp \
+    jacobi.cpp
 
 HEADERS += \
-    gauss.h
+    gauss.h \
+    jacobi.h
 
 OTHER_FILES += \
     cl/gauss.cl
