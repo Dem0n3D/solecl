@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x)
+int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x, float *D)
 {
     int n = A.size();
 
@@ -27,6 +27,13 @@ int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x)
         qDebug() << "fwd:" << i;
     }
 
+    if(D) {
+        *D = 1;
+        for(int i = 0; i < n-1; i++) {
+            *D *= A[i][i];
+        }
+    }
+
     // Обратный ход
 
     for(int i = n-1; i >= 0; i--)
@@ -42,7 +49,7 @@ int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x)
     return t.elapsed();
 }
 
-int Gauss(QVector< QVector<float> > A, int n, float *x)
+int Gauss(QVector< QVector<float> > A, int n, float *x, float *D)
 {
     QVector<float> b(n);
 
@@ -52,10 +59,10 @@ int Gauss(QVector< QVector<float> > A, int n, float *x)
         A[i].remove(n);
     }
 
-    return Gauss(A, b, x);
+    return Gauss(A, b, x, D);
 }
 
-int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x)
+int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)
 {
     if(!context) {
         context = new QCLContext();
@@ -94,6 +101,15 @@ int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x)
         //qDebug() << "cl fwd:" << i;
     }
 
+    if(D) {
+        float *A = new float[n*(n+1)];
+        buffA.read(0, A, n*(n+1)*sizeof(float));
+        *D = 1;
+        for(int i = 0; i < n-1; i++) {
+            *D *= A[i*(n+1)+i];
+        }
+    }
+
     for(int i = n-1; i >= 0; i--)
     {
         gauss_bp(buffA, xcl, n+1, i).waitForFinished();
@@ -109,7 +125,7 @@ int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x)
     return r;
 }
 
-int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x)
+int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, float *D)
 {
     if(!context) {
         context = new QCLContext();
@@ -127,5 +143,5 @@ int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x)
     QCLBuffer buffA = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
     buffA.write(A2, n*(n+1)*sizeof(float));
 
-    return GaussCL(buffA, n, context, x);
+    return GaussCL(buffA, n, context, x, D);
 }
