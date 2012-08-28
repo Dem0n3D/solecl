@@ -15,4 +15,11 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    gauss.cpp
+
+HEADERS += \
+    gauss.h
+
+OTHER_FILES += \
+    cl/gauss.cl
