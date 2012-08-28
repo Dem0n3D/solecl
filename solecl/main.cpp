@@ -32,8 +32,11 @@ int main(int argc, char *argv[])
 
     int r1, r2;
 
-    QVector<float> x1 = Gauss(A, N, &r1);
-    QVector<float> x2 = GaussCL(A, N, NULL, &r2);
+    float *x1 = new float[N];
+    float *x2 = new float[N];
+
+    r1 = Gauss(A, N, x1);
+    r2 = GaussCL(A, N, NULL, x2);
 
     float sum = 0;
     for(int i = 0; i < N; i++) {

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-QVector<float> Gauss(QVector< QVector<float> > A, QVector<float> b, int *r)
+int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x)
 {
     int n = A.size();
 
@@ -29,8 +29,6 @@ QVector<float> Gauss(QVector< QVector<float> > A, QVector<float> b, int *r)
 
     // Обратный ход
 
-    QVector<float> x = QVector<float>(n);
-
     for(int i = n-1; i >= 0; i--)
     {
         float s = 0;
@@ -41,13 +39,10 @@ QVector<float> Gauss(QVector< QVector<float> > A, QVector<float> b, int *r)
         qDebug() << "bck:" << i;
     }
 
-    if(r)
-        *r = t.elapsed();
-
-    return x;
+    return t.elapsed();
 }
 
-QVector<float> Gauss(QVector< QVector<float> > A, int n, int *r)
+int Gauss(QVector< QVector<float> > A, int n, float *x)
 {
     QVector<float> b(n);
 
@@ -57,10 +52,10 @@ QVector<float> Gauss(QVector< QVector<float> > A, int n, int *r)
         A[i].remove(n);
     }
 
-    return Gauss(A, b, r);
+    return Gauss(A, b, x);
 }
 
-QVector<float> GaussCL(QCLBuffer buffA, int n, QCLContext *context, int *r)
+int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x)
 {
     if(!context) {
         context = new QCLContext();
@@ -86,7 +81,7 @@ QVector<float> GaussCL(QCLBuffer buffA, int n, QCLContext *context, int *r)
     gauss_b.setGlobalWorkSize(1,n);
     gauss_bp.setGlobalWorkSize(1,n);
 
-    QCLVector<float> x = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
+    QCLVector<float> xcl = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
 
     QTime t;
     t.start();
@@ -101,23 +96,20 @@ QVector<float> GaussCL(QCLBuffer buffA, int n, QCLContext *context, int *r)
 
     for(int i = n-1; i >= 0; i--)
     {
-        gauss_bp(buffA, x, n+1, i).waitForFinished();
-        gauss_b(buffA, x, n+1, i).waitForFinished();
+        gauss_bp(buffA, xcl, n+1, i).waitForFinished();
+        gauss_b(buffA, xcl, n+1, i).waitForFinished();
 
         qDebug() << "cl bck:" << n-i;
     }
 
-    if(r)
-        *r = t.elapsed();
+    int r = t.elapsed();
 
-    QVector<float> x2(n);
+    xcl.read(x, n);
 
-    x.read(&x2[0], n);
-
-    return x2;
+    return r;
 }
 
-QVector<float> GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, int *r)
+int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x)
 {
     if(!context) {
         context = new QCLContext();
@@ -135,5 +127,5 @@ QVector<float> GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, 
     QCLBuffer buffA = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
     buffA.write(A2, n*(n+1)*sizeof(float));
 
-    return GaussCL(buffA, n, context, r);
+    return GaussCL(buffA, n, context, x);
 }

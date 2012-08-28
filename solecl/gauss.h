@@ -6,10 +6,10 @@
 
 #include <QVector>
 
-QVector<float> Gauss(QVector< QVector<float> > A, QVector<float> b, int *r = NULL);
-QVector<float> Gauss(QVector< QVector<float> > A, int n, int *r = NULL);
+int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x = NULL);
+int Gauss(QVector< QVector<float> > A, int n, float *x = NULL);
 
-QVector<float> GaussCL(QCLBuffer buffA, int n, QCLContext *context = NULL, int *r = NULL);
-QVector<float> GaussCL(QVector< QVector<float> >, int n, QCLContext *context = NULL, int *r = NULL);
+int GaussCL(QCLBuffer buffA, int n, QCLContext *context = NULL, float *x = NULL);
+int GaussCL(QVector< QVector<float> >, int n, QCLContext *context = NULL, float *x = NULL);
 
 #endif // GAUSS_H
