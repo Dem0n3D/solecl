@@ -123,7 +123,6 @@ int JacobiCL2(QVector< QVector<float> > A, int n, QCLContext *context, float *x,
     QCLBuffer buffA2 = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
 
     buffA.write(A2, n*(n+1)*sizeof(float));
-    buffA2.write(A2, n*(n+1)*sizeof(float));
 
     QCLVector<float> xcl = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
 
