@@ -4,7 +4,7 @@ import random
 
 random.seed()
 
-nlist = [1000]
+nlist = [10000]
 
 for n in nlist:
 	M = n*10

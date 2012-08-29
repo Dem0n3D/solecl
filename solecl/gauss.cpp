@@ -98,7 +98,7 @@ int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)
         gauss_f_pre(buffA, n+1, i).waitForFinished();
         gauss_f(buffA, n+1, i).waitForFinished();
 
-        //qDebug() << "cl fwd:" << i;
+        qDebug() << "cl fwd:" << i;
     }
 
     if(D) {

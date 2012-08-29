@@ -7,7 +7,9 @@
 #include <QVector>
 #include <QDebug>
 
+#include "util.h"
 #include "gauss.h"
+#include "jacobi.h"
 
 using namespace std;
 
@@ -35,13 +37,21 @@ int main(int argc, char *argv[])
     float *x1 = new float[N];
     float *x2 = new float[N];
 
-    r1 = Gauss(A, N, x1);
-    r2 = GaussCL(A, N, NULL, x2);
+    float D;
 
-    float sum = 0;
+    //r1 = Gauss(A, N, x1);
+
+//    qDebug() << D;
+    r1 = Gauss(A, N, x1);
+    r2 = Jacobi(A, N, x2);
+
+    float max = 0;
     for(int i = 0; i < N; i++) {
-        sum += fabs(x1[i]-x2[i]);
+        max = (max > fabs(x1[i]-x2[i])) ? max : fabs(x1[i]-x2[i]);
     }
 
-    qDebug() << r1 << r2 << sum;
+    outX(x1, N);
+    outX(x2, N);
+
+    qDebug() << r1 << r2 << max;
 }
