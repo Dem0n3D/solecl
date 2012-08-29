@@ -28,3 +28,13 @@ QVector< QVector<float> > outM(float *A, int m, int n, bool show)
 
     return M;
 }
+
+float normMax(float *x1, float *x2, int n) // Норма-максимум разности векторов
+{
+    float max = 0;
+    for(int i = 0; i < n; i++) {
+        float norm = fabs(x1[i] - x2[i]);
+        max = (max > norm) ? max : norm;
+    }
+    return max;
+}

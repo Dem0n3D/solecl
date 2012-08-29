@@ -1,19 +1,9 @@
 #include "jacobi.h"
 
-#include <math.h>
+#include "util.h"
 
 #include <QDebug>
 #include <QTime>
-
-float normMax(float *x1, float *x2, int n)
-{
-    float max = 0;
-    for(int i = 0; i < n; i++) {
-        float norm = fabs(x1[i] - x2[i]);
-        max = (max > norm) ? max : norm;
-    }
-    return max;
-}
 
 int Jacobi(QVector< QVector<float> > A, int n, float *x, float eps)
 {
@@ -31,8 +21,11 @@ int Jacobi(QVector< QVector<float> > A, int n, float *x, float eps)
         memcpy(x2, x, n*sizeof(float));
         for(int i = 0; i < n; i++) {
             float sum = A[i][n];
-            for(int j = 0; j < n; j++) {
-                sum -= (i == j) ? 0 : A[i][j]*x2[j];
+            for(int j = 0; j < i; j++) {
+                sum -= A[i][j]*x2[j];
+            }
+            for(int j = i+1; j < n; j++) {
+                sum -= A[i][j]*x2[j];
             }
             x[i] = sum / A[i][i];
         }
@@ -98,11 +91,7 @@ int JacobiCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, 
         qDebug() << "JCL:"<< it++ << norm;
     }
 
-    int r = t.elapsed();
-
-    xcl.read(x, n);
-
-    return r;
+    return t.elapsed();
 }
 
 int JacobiCL2(QVector< QVector<float> > A, int n, QCLContext *context, float *x, float eps)
@@ -163,9 +152,5 @@ int JacobiCL2(QVector< QVector<float> > A, int n, QCLContext *context, float *x,
         qDebug() << "JCL2:"<< it++ << norm;
     }
 
-    int r = t.elapsed();
-
-    xcl.read(x, n);
-
-    return r;
+    return t.elapsed();
 }

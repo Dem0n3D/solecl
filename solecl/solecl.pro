@@ -18,13 +18,16 @@ TEMPLATE = app
 SOURCES += main.cpp \
     gauss.cpp \
     jacobi.cpp \
-    util.cpp
+    util.cpp \
+    zeidel.cpp
 
 HEADERS += \
     gauss.h \
     jacobi.h \
-    util.h
+    util.h \
+    zeidel.h
 
 OTHER_FILES += \
     cl/gauss.cl \
-    cl/jacobi.cl
+    cl/jacobi.cl \
+    cl/zeidel.cl

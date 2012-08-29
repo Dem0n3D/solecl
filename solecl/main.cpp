@@ -10,6 +10,7 @@
 #include "util.h"
 #include "gauss.h"
 #include "jacobi.h"
+#include "zeidel.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 100;
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
     ifstream f(fname.str().c_str());
@@ -39,8 +40,8 @@ int main(int argc, char *argv[])
 
     float D;
 
-    r1 = JacobiCL(A, N, NULL, x1);
-    r2 = JacobiCL2(A, N, NULL, x2);
+    r1 = Zeidel(A, N, x1);
+    r2 = ZeidelCL(A, N, NULL, x2);
 
     float max = 0;
     for(int i = 0; i < N; i++) {
