@@ -68,7 +68,7 @@ int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)
         context = new QCLContext();
 
         if(!context->create(QCLDevice::GPU)) {
-            qWarning("Could not create OpenCL context");
+            qFatal("Could not create OpenCL context");
         }
     }
 
@@ -131,7 +131,7 @@ int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, f
         context = new QCLContext();
 
         if(!context->create(QCLDevice::GPU)) {
-            qWarning("Could not create OpenCL context");
+            qFatal("Could not create OpenCL context");
         }
     }
 

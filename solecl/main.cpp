@@ -39,11 +39,8 @@ int main(int argc, char *argv[])
 
     float D;
 
-    //r1 = Gauss(A, N, x1);
-
-//    qDebug() << D;
-    r1 = Gauss(A, N, x1);
-    r2 = Jacobi(A, N, x2);
+    r1 = GaussCL(A, N, NULL, x1);
+    r2 = JacobiCL(A, N, NULL, x2);
 
     float max = 0;
     for(int i = 0; i < N; i++) {

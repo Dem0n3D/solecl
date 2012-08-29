@@ -26,4 +26,5 @@ HEADERS += \
     util.h
 
 OTHER_FILES += \
-    cl/gauss.cl
+    cl/gauss.cl \
+    cl/jacobi.cl
