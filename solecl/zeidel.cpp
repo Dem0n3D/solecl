@@ -11,8 +11,28 @@ int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps)
     memset(x, 0, n*sizeof(float));
     memset(x2, 0, n*sizeof(float));
 
+    QVector< QVector<float> > B = A;
+
     QTime t;
     t.start();
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            A[i][j] = 0;
+            for(int k = 0; k < n; k++) {
+                A[i][j] += B[k][i] * B[k][j]; // Умножение транспонированной матрицы
+            }
+        }
+    }
+
+    for(int i = 0; i < n; i++) {
+        A[i][n] = 0;
+        for(int k = 0; k < n; k++) {
+            A[i][n] += B[k][i] * B[k][n];
+        }
+    }
+
+    qDebug() << t.elapsed();
 
     int it = 0;
     float norm = 1;
