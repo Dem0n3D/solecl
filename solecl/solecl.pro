@@ -30,4 +30,5 @@ HEADERS += \
 OTHER_FILES += \
     cl/gauss.cl \
     cl/jacobi.cl \
-    cl/zeidel.cl
+    cl/zeidel.cl \
+    cl/matrix.cl

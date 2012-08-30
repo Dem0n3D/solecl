@@ -38,3 +38,63 @@ float normMax(float *x1, float *x2, int n) // Норма-максимум раз
     }
     return max;
 }
+
+int multMatrix(QCLBuffer buffA, QCLBuffer buffB, float *C, int n, QCLContext *context)
+{
+    size_t Msize = n*n*sizeof(float);
+
+    memset(C, 0, Msize);
+
+    QCLProgram program;
+
+    program = context->buildProgramFromSourceFile(QLatin1String("cl/matrix.cl"));
+
+    QCLKernel mult = program.createKernel("mult");
+
+    mult.setGlobalWorkSize(n, n);
+
+    QCLBuffer buffC = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+
+    QTime t;
+    t.start();
+
+    mult(buffA, buffB, buffC, n);
+
+    buffC.read(C, Msize);
+
+    return t.elapsed();
+}
+
+
+int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *C, int n, QCLContext *context)
+{
+    if(!context) {
+        context = new QCLContext();
+
+        if(!context->create(QCLDevice::GPU)) {
+            qFatal("Could not create OpenCL context");
+        }
+    }
+
+    size_t Msize = n*n*sizeof(float);
+
+    float *A2 = new float[n*n];
+    for(int i = 0; i < n; i++) {
+        memcpy(&A2[i*n], A[i].data(), n*sizeof(float));
+    }
+
+    float *B2 = new float[n*n];
+    for(int i = 0; i < n; i++) {
+        memcpy(&B2[i*n], B[i].data(), n*sizeof(float));
+    }
+
+    memset(C, 0, Msize);
+
+    QCLBuffer buffA = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+    QCLBuffer buffB = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+
+    buffA.write(A2, Msize);
+    buffB.write(B2, Msize);
+
+    return multMatrix(buffA, buffB, C, n, context);
+}

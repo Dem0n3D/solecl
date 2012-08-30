@@ -3,7 +3,6 @@
 #include "util.h"
 
 #include <QDebug>
-#include <QTime>
 
 int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps)
 {

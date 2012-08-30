@@ -4,23 +4,16 @@ import random
 
 random.seed()
 
-nlist = [10000]
+nlist = [10, 100, 1000, 10000]
 
 for n in nlist:
 	M = n*10
 	f = open('matrix%d.txt' % n, 'w')
 	for i in xrange(n):
 		s = ''
-		d = random.random()*M # Диагональный элемент (для соблюдения условия диагонального преобладания)
-		r = d
 		for j in xrange(n):
-			if(i == j):
-				s += '%f ' % d
-			else:
-				t = random.random()*r/(n-j)
-				r -= t
-				s += '%f ' % t
-		s += '%f\n' % (random.random()*M)
+			s += '%f ' % (random.random() * M * (-1 if random.randint(1, 2)%2 == 0 else 1))
+		s += '%f\n' % (random.random() * M * (-1 if random.randint(1, 2)%2 == 0 else 1))
 		f.write(s)
 	f.close()
 	print(n)

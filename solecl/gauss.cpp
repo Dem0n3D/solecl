@@ -1,7 +1,8 @@
 #include "gauss.h"
 
+#include "util.h"
+
 #include <QDebug>
-#include <QTime>
 
 int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x, float *D)
 {

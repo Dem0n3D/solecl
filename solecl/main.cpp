@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    int r1, r2;
+    /*int r1, r2;
 
     float *x1 = new float[N];
     float *x2 = new float[N];
@@ -51,5 +51,10 @@ int main(int argc, char *argv[])
     outX(x1, N);
     outX(x2, N);
 
-    qDebug() << r1 << r2 << max;
+    qDebug() << r1 << r2 << max;*/
+
+    float *C = new float[N*N];
+    qDebug() << multMatrix(A, A, C, N);
+    //outM(C, N, N);
+
 }
