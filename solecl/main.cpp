@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 3;
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
     ifstream f(fname.str().c_str());
@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
 
     float D;
 
-    r1 = Zeidel(A, N, x1);
-    r2 = ZeidelCL(A, N, NULL, x2);
+    r1 = Zeidel(A, N, x1, 0.01);
+    r2 = GaussCL(A, N, NULL, x2);
 
     float max = 0;
     for(int i = 0; i < N; i++) {
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     qDebug() << r1 << r2 << max;*/
 
     float *C = new float[N*N];
-    qDebug() << multMatrix(A, A, C, N);
-    //outM(C, N, N);
-
+    int t = multMatrix(A, A, C, N);
+    outM(C, N, N);
+    qDebug() << t;
 }

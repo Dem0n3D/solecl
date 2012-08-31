@@ -41,26 +41,29 @@ float normMax(float *x1, float *x2, int n) // Норма-максимум раз
 
 int multMatrix(QCLBuffer buffA, QCLBuffer buffB, float *C, int n, QCLContext *context)
 {
-    size_t Msize = n*n*sizeof(float);
-
-    memset(C, 0, Msize);
+    size_t mSize = n*n*sizeof(float);
+    size_t gSize = context->defaultDevice().maximumWorkItemSize().height();
+    gSize = (n < gSize) ? n : gSize;
 
     QCLProgram program;
-
     program = context->buildProgramFromSourceFile(QLatin1String("cl/matrix.cl"));
 
     QCLKernel mult = program.createKernel("mult");
+    mult.setGlobalWorkSize(n, n, n);
+    mult.setLocalWorkSize(gSize);
 
-    mult.setGlobalWorkSize(n, n);
+    QCLBuffer buffC = context->createBufferDevice(mSize, QCLMemoryObject::ReadWrite);
+    memset(C, 0, mSize);
+    buffC.write(C, mSize);
 
-    QCLBuffer buffC = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+    clSetKernelArg(mult.kernelId(), 4, gSize*sizeof(cl_float), NULL);
 
     QTime t;
     t.start();
 
     mult(buffA, buffB, buffC, n);
 
-    buffC.read(C, Msize);
+    buffC.read(C, mSize);
 
     return t.elapsed();
 }
@@ -76,7 +79,7 @@ int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *
         }
     }
 
-    size_t Msize = n*n*sizeof(float);
+    size_t mSize = n*n*sizeof(float);
 
     float *A2 = new float[n*n];
     for(int i = 0; i < n; i++) {
@@ -88,13 +91,13 @@ int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *
         memcpy(&B2[i*n], B[i].data(), n*sizeof(float));
     }
 
-    memset(C, 0, Msize);
+    memset(C, 0, mSize);
 
-    QCLBuffer buffA = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
-    QCLBuffer buffB = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+    QCLBuffer buffA = context->createBufferDevice(mSize, QCLMemoryObject::ReadWrite);
+    QCLBuffer buffB = context->createBufferDevice(mSize, QCLMemoryObject::ReadWrite);
 
-    buffA.write(A2, Msize);
-    buffB.write(B2, Msize);
+    buffA.write(A2, mSize);
+    buffB.write(B2, mSize);
 
     return multMatrix(buffA, buffB, C, n, context);
 }
