@@ -16,4 +16,6 @@ float normMax(float *x1, float *x2, int n);
 int multMatrix(QCLBuffer buffA, QCLBuffer buffB, float *C, int n, QCLContext *context);
 int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *C, int n, QCLContext *context = NULL);
 
+int multTransp(QVector< QVector<float> > A, float *C, int n, QCLContext *context, QCLBuffer *buffC);
+
 #endif // UTIL_H

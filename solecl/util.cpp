@@ -98,3 +98,44 @@ int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *
 
     return multMatrix(buffA, buffB, C, n, context);
 }
+
+int multTransp(QVector< QVector<float> > A, float *C, int n, QCLContext *context, QCLBuffer *buffC)
+{
+    size_t Msize = n*(n+1)*sizeof(float);
+
+    float *A2 = new float[n*(n+1)];
+    for(int i = 0; i < n; i++) {
+        memcpy(&A2[i*(n+1)], A[i].data(), (n+1)*sizeof(float));
+    }
+
+    memset(C, 0, Msize);
+
+    QCLBuffer buffA = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+    buffA.write(A2, Msize);
+
+    QCLProgram program;
+
+    program = context->buildProgramFromSourceFile(QLatin1String("cl/matrix.cl"));
+
+    QCLKernel multTransp = program.createKernel("multTransp");
+    QCLKernel multTranspB = program.createKernel("multTranspB");
+
+    multTransp.setGlobalWorkSize(n, n);
+    multTranspB.setGlobalWorkSize(n);
+
+    if(!buffC)
+        buffC = new QCLBuffer();
+
+    *buffC = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
+
+    QTime t;
+    t.start();
+
+    multTransp(buffA, *buffC, n);
+    multTranspB(buffA, *buffC, n);
+
+    buffC->read(C, Msize);
+
+    return t.elapsed();
+}
+
