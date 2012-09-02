@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     int t0, t1, t2, t3, t4;
 
-    QVector< QVector<float> > C(N, QVector<float>(N+1, 0));
+    QVector< QVector<float> > AtA(N, QVector<float>(N+1, 0));
 
     QCLContext *context = new QCLContext();
     QCLBuffer buffC;
@@ -44,14 +44,14 @@ int main(int argc, char *argv[])
         qFatal("Could not create OpenCL context");
     }
 
-    t0 = multTransp(A, C, N, context, &buffC);
+    //t0 = multTranspCL(A, AtA, N, context, &buffC);
 
-    A = C;
+    t0 = multTransp(A, AtA);
 
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
-    t1 = Zeidel(A, N, x1, 0.001, &t4);
+    t1 = Zeidel(AtA, N, x1, 0.001);
     //t2 = ZeidelCL2(buffC, N, context, x2, 0.1);
     t3 = Gauss(A, N, x2);
 
@@ -63,5 +63,5 @@ int main(int argc, char *argv[])
     outX(x1);
     outX(x2);
 
-    qDebug() << t1+t0 << t2 << t3 << t0 << t1 << t4 << max;
+    qDebug() << t0 << t1 << t3 << max;
 }

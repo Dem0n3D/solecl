@@ -5,7 +5,9 @@
 
 #include <QVector>
 
-int Zeidel(QVector< QVector<float> > A, int n, QVector<float> &x, float eps = 0.001, int *tmult = NULL);
+int multTransp(const QVector< QVector<float> > &A, QVector< QVector<float> > &AtA);
+
+int Zeidel(const QVector< QVector<float> > &A, int n, QVector<float> &x, float eps = 0.001);
 
 int ZeidelCL(QVector< QVector<float> > A, int n, QCLContext *context = NULL, float *x = NULL, float eps = 0.001);
 

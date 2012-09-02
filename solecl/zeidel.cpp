@@ -4,34 +4,37 @@
 
 #include <QDebug>
 
-int Zeidel(QVector< QVector<float> > A, int n, QVector<float> &x, float eps, int *tmult)
+int multTransp(const QVector< QVector<float> > &A, QVector< QVector<float> > &AtA)
 {
-    QVector<float> x2(n, 0);
-
-    QVector< QVector<float> > B = A;
-
     QTime t;
     t.start();
 
-   /* for(int i = 0; i < n; i++) {
+    int n = A.size();
+
+    for(int i = 0; i < n; i++) {
         for(int j = 0; j < n; j++) {
-            A[i][j] = 0;
+            AtA[i][j] = 0;
             for(int k = 0; k < n; k++) {
-                A[i][j] += B[k][i] * B[k][j]; // Умножение транспонированной матрицы
+                AtA[i][j] += A[k][i] * A[k][j]; // Умножение транспонированной матрицы
             }
         }
     }
 
     for(int i = 0; i < n; i++) {
-        A[i][n] = 0;
+        AtA[i][n] = 0;
         for(int k = 0; k < n; k++) {
-            A[i][n] += B[k][i] * B[k][n];
+            AtA[i][n] += A[k][i] * A[k][n];
         }
-    }*/
+    }
 
-    if(tmult)
-        *tmult = t.elapsed();
+    return t.elapsed();
+}
 
+int Zeidel(const QVector< QVector<float> > &A, int n, QVector<float> &x, float eps)
+{
+    QVector<float> x2(n, 0);
+
+    QTime t;
     t.start();
 
     int it = 0;

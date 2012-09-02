@@ -39,6 +39,20 @@ float normMax(const QVector<float> &x1, const QVector<float> &x2) // Норма-
     return max;
 }
 
+void matrix2CLBuff(const QVector< QVector<float> > &M, QCLBuffer buff)
+{
+    size_t n = M.size();
+    for(int i = 0; i < n; i++)
+        buff.write(i*(n+1)*sizeof(float), M[i].data(), (n+1)*sizeof(float));
+}
+
+void CLBuff2matrix(QCLBuffer buff, QVector< QVector<float> > &M)
+{
+    size_t n = M.size();
+    for(int i = 0; i < n; i++)
+        buff.read(i*(n+1)*sizeof(float), &M[i][0], (n+1)*sizeof(float));
+}
+
 int multMatrix(QCLBuffer buffA, QCLBuffer buffB, float *C, int n, QCLContext *context)
 {
     size_t Msize = n*n*sizeof(float);
@@ -99,13 +113,12 @@ int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *
     return multMatrix(buffA, buffB, C, n, context);
 }
 
-int multTransp(const QVector< QVector<float> > &A, QVector< QVector<float> > &C, int n, QCLContext *context, QCLBuffer *buffC)
+int multTranspCL(const QVector< QVector<float> > &A, QVector< QVector<float> > &C, int n, QCLContext *context, QCLBuffer *buffC)
 {
     size_t Msize = n*(n+1)*sizeof(float);
 
     QCLBuffer buffA = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
-    for(int i = 0; i < n; i++)
-        buffA.write(i*(n+1)*sizeof(float), A[i].data(), (n+1)*sizeof(float));
+    matrix2CLBuff(A, buffA);
 
     QCLProgram program;
 
@@ -128,8 +141,7 @@ int multTransp(const QVector< QVector<float> > &A, QVector< QVector<float> > &C,
     multTransp(buffA, *buffC, n);
     multTranspB(buffA, *buffC, n);
 
-    for(int i = 0; i < n; i++)
-        buffC->read(i*(n+1)*sizeof(float), &C[i][0], (n+1)*sizeof(float));
+    CLBuff2matrix(*buffC, C);
 
     return t.elapsed();
 }
