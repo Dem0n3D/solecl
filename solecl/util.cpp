@@ -1,38 +1,38 @@
 #include "util.h"
 
+#include <sstream>
+
 #include <QDebug>
 
-QVector<float> outX(float *x, int n, bool show)
+void outX(QVector<float> x)
 {
-    QVector<float> v(n);
-    for(int i = 0; i < n; i++) {
-        v[i] = x[i];
-    }
-
-    if(show)
-        qDebug() << v;
-
-    return v;
+    qDebug() << "OutX:";
+    qDebug() << x;
 }
 
-QVector< QVector<float> > outM(float *A, int m, int n, bool show)
+void outM(QVector< QVector<float> > M)
 {
-    QVector< QVector<float> > M(m, QVector<float>(n));
-    for(int i = 0; i < m; i++) {
-        for(int j = 0; j < n; j++) {
-            M[i][j] = A[i*n+j];
-        }
-        if(show)
-            qDebug() <<M[i];
-    }
+    qDebug() << "OutM:";
 
-    return M;
+    for(int i = 0; i < M.size(); i++) {
+            qDebug() << M[i];
+    }
 }
 
 float normMax(float *x1, float *x2, int n) // Норма-максимум разности векторов
 {
     float max = 0;
     for(int i = 0; i < n; i++) {
+        float norm = fabs(x1[i] - x2[i]);
+        max = (max > norm) ? max : norm;
+    }
+    return max;
+}
+
+float normMax(const QVector<float> &x1, const QVector<float> &x2) // Норма-максимум разности векторов
+{
+    float max = 0;
+    for(int i = 0; i < x1.size(); i++) {
         float norm = fabs(x1[i] - x2[i]);
         max = (max > norm) ? max : norm;
     }
@@ -99,19 +99,13 @@ int multMatrix(QVector< QVector<float> > A, QVector< QVector<float> > B, float *
     return multMatrix(buffA, buffB, C, n, context);
 }
 
-int multTransp(QVector< QVector<float> > A, float *C, int n, QCLContext *context, QCLBuffer *buffC)
+int multTransp(const QVector< QVector<float> > &A, QVector< QVector<float> > &C, int n, QCLContext *context, QCLBuffer *buffC)
 {
     size_t Msize = n*(n+1)*sizeof(float);
 
-    float *A2 = new float[n*(n+1)];
-    for(int i = 0; i < n; i++) {
-        memcpy(&A2[i*(n+1)], A[i].data(), (n+1)*sizeof(float));
-    }
-
-    memset(C, 0, Msize);
-
     QCLBuffer buffA = context->createBufferDevice(Msize, QCLMemoryObject::ReadWrite);
-    buffA.write(A2, Msize);
+    for(int i = 0; i < n; i++)
+        buffA.write(i*(n+1)*sizeof(float), A[i].data(), (n+1)*sizeof(float));
 
     QCLProgram program;
 
@@ -134,7 +128,8 @@ int multTransp(QVector< QVector<float> > A, float *C, int n, QCLContext *context
     multTransp(buffA, *buffC, n);
     multTranspB(buffA, *buffC, n);
 
-    buffC->read(C, Msize);
+    for(int i = 0; i < n; i++)
+        buffC->read(i*(n+1)*sizeof(float), &C[i][0], (n+1)*sizeof(float));
 
     return t.elapsed();
 }

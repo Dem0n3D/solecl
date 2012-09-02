@@ -4,19 +4,16 @@
 
 #include <QDebug>
 
-int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps, int *tmult)
+int Zeidel(QVector< QVector<float> > A, int n, QVector<float> &x, float eps, int *tmult)
 {
-    float *x2 = new float[n];
-
-    memset(x, 0, n*sizeof(float));
-    memset(x2, 0, n*sizeof(float));
+    QVector<float> x2(n, 0);
 
     QVector< QVector<float> > B = A;
 
     QTime t;
     t.start();
 
-    for(int i = 0; i < n; i++) {
+   /* for(int i = 0; i < n; i++) {
         for(int j = 0; j < n; j++) {
             A[i][j] = 0;
             for(int k = 0; k < n; k++) {
@@ -30,7 +27,7 @@ int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps, int *tmult)
         for(int k = 0; k < n; k++) {
             A[i][n] += B[k][i] * B[k][n];
         }
-    }
+    }*/
 
     if(tmult)
         *tmult = t.elapsed();
@@ -40,7 +37,7 @@ int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps, int *tmult)
     int it = 0;
     float norm = 1;
     while(norm > eps) {
-        memcpy(x2, x, n*sizeof(float));
+        x2 = x;
         for(int i = 0; i < n; i++) {
             float sum = A[i][n];
             for(int j = 0; j < i; j++) {
@@ -51,7 +48,7 @@ int Zeidel(QVector< QVector<float> > A, int n, float *x, float eps, int *tmult)
             }
             x[i] = sum / A[i][i];
         }
-        norm = normMax(x, x2, n);
+        norm = normMax(x, x2);
         qDebug() << "Z:"<< it++ << norm;
     }
 

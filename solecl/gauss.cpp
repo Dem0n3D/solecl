@@ -4,10 +4,8 @@
 
 #include <QDebug>
 
-int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x, float *D)
+int Gauss(QVector< QVector<float> > A, int n, QVector<float> &x, float *D)
 {
-    int n = A.size();
-
     QTime t;
     t.start();
 
@@ -20,7 +18,7 @@ int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x, float *D)
             A[j][i] /= A[i][i];
             for(int k = i+1; k < n; k++)
                 A[j][k] -= A[i][k]*A[j][i];
-            b[j] -= b[i]*A[j][i];
+            A[j][n] -= A[i][n]*A[j][i];
 
             // Не будем обнулять элементы ниже главной диагонали (A[j][i]), мы их просто не будем потом использовать
         }
@@ -42,25 +40,12 @@ int Gauss(QVector< QVector<float> > A, QVector<float> b, float *x, float *D)
         float s = 0;
         for(int j = i+1; j < n; j++)
             s += A[i][j]*x[j];
-        x[i] = (b[i]-s)/A[i][i];
+        x[i] = (A[i][n]-s)/A[i][i];
 
         qDebug() << "bck:" << i;
     }
 
     return t.elapsed();
-}
-
-int Gauss(QVector< QVector<float> > A, int n, float *x, float *D)
-{
-    QVector<float> b(n);
-
-    for(int i = 0; i < n; i++)
-    {
-        b[i] = A[i][n];
-        A[i].remove(n);
-    }
-
-    return Gauss(A, b, x, D);
 }
 
 int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)

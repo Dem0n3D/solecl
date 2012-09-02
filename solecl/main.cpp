@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 100;
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
     ifstream f(fname.str().c_str());
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     int t0, t1, t2, t3, t4;
 
-    float *C = new float[N*(N+1)];
+    QVector< QVector<float> > C(N, QVector<float>(N+1, 0));
 
     QCLContext *context = new QCLContext();
     QCLBuffer buffC;
@@ -46,22 +46,22 @@ int main(int argc, char *argv[])
 
     t0 = multTransp(A, C, N, context, &buffC);
 
-    float *x1 = new float[N];
-    float *x2 = new float[N];
+    A = C;
 
-    float D;
+    QVector<float> x1(N, 0);
+    QVector<float> x2(N, 0);
 
-    t1 = Zeidel(A, N, x1, 0.1, &t4);
-    t2 = ZeidelCL2(buffC, N, context, x2, 0.1);
-    t3 = GaussCL(buffC, N, context, x2);
+    t1 = Zeidel(A, N, x1, 0.001, &t4);
+    //t2 = ZeidelCL2(buffC, N, context, x2, 0.1);
+    t3 = Gauss(A, N, x2);
 
     float max = 0;
     for(int i = 0; i < N; i++) {
         max = (max > fabs(x1[i]-x2[i])) ? max : fabs(x1[i]-x2[i]);
     }
 
-    outX(x1, N);
-    outX(x2, N);
+    outX(x1);
+    outX(x2);
 
-    qDebug() << t1+t4 << t2 << t3 << t0 << t1 << t4 << max;
+    qDebug() << t1+t0 << t2 << t3 << t0 << t1 << t4 << max;
 }
