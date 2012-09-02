@@ -7,7 +7,7 @@
 
 int Gauss(QVector< QVector<float> > A, int n, QVector<float> &x, float *D = NULL);
 
-int GaussCL(QCLBuffer buffA, int n, QCLContext *context = NULL, float *x = NULL, float *D = NULL);
-int GaussCL(QVector< QVector<float> >, int n, QCLContext *context = NULL, float *x = NULL, float *D = NULL);
+int GaussCL(QCLBuffer buffA, int n, float *x = NULL, QCLContext *context = NULL, float *D = NULL);
+int GaussCL(const QVector< QVector<float> > &A, int n, QVector<float> &x, QCLContext *context = NULL, float *D = NULL);
 
 #endif // GAUSS_H

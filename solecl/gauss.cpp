@@ -48,7 +48,7 @@ int Gauss(QVector< QVector<float> > A, int n, QVector<float> &x, float *D)
     return t.elapsed();
 }
 
-int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)
+int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, float *D)
 {
     if(!context) {
         context = new QCLContext();
@@ -106,12 +106,12 @@ int GaussCL(QCLBuffer buffA, int n, QCLContext *context, float *x, float *D)
 
     int r = t.elapsed();
 
-    xcl.read(x, n);
+    xcl.read(&x[0], n);
 
     return r;
 }
 
-int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, float *D)
+int GaussCL(const QVector< QVector<float> > &A, int n, QVector<float> &x, QCLContext *context, float *D)
 {
     if(!context) {
         context = new QCLContext();
@@ -129,5 +129,5 @@ int GaussCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, f
     QCLBuffer buffA = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
     buffA.write(A2, n*(n+1)*sizeof(float));
 
-    return GaussCL(buffA, n, context, x, D);
+    return GaussCL(buffA, n, x, context, D);
 }

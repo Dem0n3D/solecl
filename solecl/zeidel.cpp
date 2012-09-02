@@ -118,7 +118,7 @@ int ZeidelCL(QVector< QVector<float> > A, int n, QCLContext *context, float *x, 
     return t.elapsed();
 }
 
-int ZeidelCL2(QCLBuffer buffA, int n, QCLContext *context, float *x, float eps)
+int ZeidelCL2(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, float eps)
 {
     QCLProgram program;
 
@@ -133,13 +133,10 @@ int ZeidelCL2(QCLBuffer buffA, int n, QCLContext *context, float *x, float eps)
     QCLBuffer buffA2 = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
     buffA.copyTo(0, n*(n+1)*sizeof(float), buffA2, 0);
 
-    float *x2 = new float[n];
-
-    memset(x, 0, n*sizeof(float));
-    memset(x2, 0, n*sizeof(float));
+    QVector<float> x2 = QVector<float>(n, 0);
 
     QCLVector<float> xcl = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
-    xcl.write(x, n);
+    xcl.write(x.data(), n);
 
     QTime t;
     t.start();
@@ -148,15 +145,15 @@ int ZeidelCL2(QCLBuffer buffA, int n, QCLContext *context, float *x, float eps)
     float norm = 1;
     while(norm > eps)
     {
-        memcpy(x2, x, n*sizeof(float));
+        x2 = x;
 
         for(int i = 0; i < n; i++) {
             zeidel_pre2(buffA, buffA2, xcl, n, i).waitForFinished();
             zeidel2(buffA, buffA2, xcl, n, i).waitForFinished();
         }
 
-        xcl.read(x, n);
-        norm = normMax(x, x2, n);
+        xcl.read(&x[0], n);
+        norm = normMax(x, x2);
 
         qDebug() << "ZCL2:"<< it++ << norm;
     }
@@ -164,7 +161,7 @@ int ZeidelCL2(QCLBuffer buffA, int n, QCLContext *context, float *x, float eps)
     return t.elapsed();
 }
 
-int ZeidelCL2(QVector< QVector<float> > A, int n, QCLContext *context, float *x, float eps)
+int ZeidelCL2(QVector< QVector<float> > A, int n, QVector<float> &x, QCLContext *context, float eps)
 {
     if(!context) {
         context = new QCLContext();
@@ -182,5 +179,5 @@ int ZeidelCL2(QVector< QVector<float> > A, int n, QCLContext *context, float *x,
     QCLBuffer buffA = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
     buffA.write(A2, n*(n+1)*sizeof(float));
 
-    return ZeidelCL2(buffA, n, context, x, eps);
+    return ZeidelCL2(buffA, n, x, context, eps);
 }

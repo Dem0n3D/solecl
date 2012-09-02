@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 100;
+    N = 1000;
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
     ifstream f(fname.str().c_str());
@@ -38,22 +38,19 @@ int main(int argc, char *argv[])
     QVector< QVector<float> > AtA(N, QVector<float>(N+1, 0));
 
     QCLContext *context = new QCLContext();
-    QCLBuffer buffC;
+    QCLBuffer buffAtA;
 
     if(!context->create(QCLDevice::GPU)) {
         qFatal("Could not create OpenCL context");
     }
 
-    //t0 = multTranspCL(A, AtA, N, context, &buffC);
-
-    t0 = multTransp(A, AtA);
+    t0 = multTranspCL(A, AtA, N, context, &buffAtA);
 
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
     t1 = Zeidel(AtA, N, x1, 0.001);
-    //t2 = ZeidelCL2(buffC, N, context, x2, 0.1);
-    t3 = Gauss(A, N, x2);
+    t2 = GaussCL(A, N, x2, context);
 
     float max = 0;
     for(int i = 0; i < N; i++) {
@@ -63,5 +60,5 @@ int main(int argc, char *argv[])
     outX(x1);
     outX(x2);
 
-    qDebug() << t0 << t1 << t3 << max;
+    qDebug() << t0+t1 << t2 << max;
 }
