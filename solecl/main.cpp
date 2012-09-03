@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
     //cout << "Enter N: ";
     //cin >> N;
     N = 1000;
+
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
+
     ifstream f(fname.str().c_str());
 
     QVector< QVector<float> > A(N, QVector<float>(N+1));
@@ -32,6 +34,8 @@ int main(int argc, char *argv[])
             f >> A[i][j];
         }
     }
+
+    f.close();
 
     int t0, t1, t2, t3, t4;
 
@@ -49,7 +53,7 @@ int main(int argc, char *argv[])
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
-    t1 = Zeidel(AtA, N, x1, 0.001);
+    t1 = Zeidel(AtA, N, x1, 0.1);
     t2 = GaussCL(A, N, x2, context);
 
     float max = 0;
@@ -57,8 +61,8 @@ int main(int argc, char *argv[])
         max = (max > fabs(x1[i]-x2[i])) ? max : fabs(x1[i]-x2[i]);
     }
 
-    outX(x1);
-    outX(x2);
+    //outX(x1);
+    //outX(x2);
 
     qDebug() << t0+t1 << t2 << max;
 }

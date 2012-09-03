@@ -121,13 +121,8 @@ int GaussCL(const QVector< QVector<float> > &A, int n, QVector<float> &x, QCLCon
         }
     }
 
-    float *A2 = new float[n*(n+1)];
-    for(int i = 0; i < n; i++) {
-        memcpy(&A2[i*(n+1)], A[i].data(), (n+1)*sizeof(float));
-    }
-
     QCLBuffer buffA = context->createBufferDevice(n*(n+1)*sizeof(float), QCLMemoryObject::ReadWrite);
-    buffA.write(A2, n*(n+1)*sizeof(float));
+    matrix2CLBuff(A, buffA);
 
     return GaussCL(buffA, n, x, context, D);
 }
