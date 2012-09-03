@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 6000;
 
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
