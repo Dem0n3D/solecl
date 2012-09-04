@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 3100;
 
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
@@ -48,12 +48,12 @@ int main(int argc, char *argv[])
         qFatal("Could not create OpenCL context");
     }
 
-    t0 = multTranspCL(A, AtA, N, context, &buffAtA);
+    //t0 = multTranspCL(A, AtA, N, context, &buffAtA);
 
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
-    t1 = Zeidel(AtA, N, x1, 0.1);
+    //t1 = Zeidel(AtA, N, x1, 0.1);
     t2 = GaussCL(A, N, x2, context);
 
     float max = 0;
