@@ -82,18 +82,18 @@ int GaussCL(QCLBuffer buffA, int n, QCLVector<float> &xcl, int gSize, QCLContext
 
     for(int i = 0; i < n-1; i++)
     {
-        gauss_f_pre(buffA, n+1, i).waitForFinished();
-        gauss_f(buffA, n+1, i).waitForFinished();
+        gauss_f_pre(buffA, n+1, i);
+        gauss_f(buffA, n+1, i);
         if(gSize > 1)
-            gauss_f2(buffA, n+1, i).waitForFinished();
+            gauss_f2(buffA, n+1, i);
 
         log << "cl fwd:" << i << std::endl;
     }
 
     for(int i = n-1; i >= 0; i--)
     {
-        gauss_bp(buffA, xcl, n+1, i).waitForFinished();
-        gauss_b(buffA, xcl, n+1, i).waitForFinished();
+        gauss_bp(buffA, xcl, n+1, i);
+        gauss_b(buffA, xcl, n+1, i);
 
         log << "cl bck:" << n-i << std::endl;
     }
