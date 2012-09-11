@@ -95,10 +95,10 @@ int main(int argc, char *argv[])
 
             qDebug() << i1 << j << t2 << -1;
 
-            res << t2 << ' ' << -1 << ' ';
+            res << t2 << ' ';
         }
 
-        res << avg/float(test_count) << ' ' << endl;
+        res << endl;
     }
 
     res << endl;
