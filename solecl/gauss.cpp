@@ -58,7 +58,6 @@ int GaussCL(QCLBuffer buffA, int n, QCLVector<float> &xcl, int gSize, QCLContext
 
     QCLKernel gauss_f_pre = program.createKernel("gauss_fwd_pre");
     QCLKernel gauss_f = program.createKernel("gauss_fwd");
-    QCLKernel gauss_f2 = program.createKernel("gauss_fwd");
 
     QCLKernel gauss_bp = program.createKernel("gauss_bwd_prepare");
     QCLKernel gauss_b = program.createKernel("gauss_bwd");
@@ -66,11 +65,8 @@ int GaussCL(QCLBuffer buffA, int n, QCLVector<float> &xcl, int gSize, QCLContext
     int m = ((n+1) / gSize) * gSize;
 
     gauss_f_pre.setGlobalWorkSize(1, n);
-    gauss_f.setGlobalWorkSize(m, n);
-    gauss_f2.setGlobalWorkSize(n+1-m, n);
-    gauss_f2.setGlobalWorkOffset(m, 0, 0);
+    gauss_f.setGlobalWorkSize(n+1, n);
 
-    gauss_f.setLocalWorkSize(gSize);
 
     gauss_b.setGlobalWorkSize(1,n);
     gauss_bp.setGlobalWorkSize(1,n);
@@ -80,12 +76,16 @@ int GaussCL(QCLBuffer buffA, int n, QCLVector<float> &xcl, int gSize, QCLContext
     QTime t;
     t.start();
 
+    QCLVector<int> sz = context->createVector<int>(1, QCLMemoryObject::ReadWrite);
+
     for(int i = 0; i < n-1; i++)
     {
         gauss_f_pre(buffA, n+1, i);
-        gauss_f(buffA, n+1, i);
-        if(gSize > 1)
-            gauss_f2(buffA, n+1, i);
+        gauss_f(buffA, n+1, i, sz);
+        int isz;
+        sz.read(&isz, 1);
+        qDebug() << n << isz;
+        return 0;
 
         log << "cl fwd:" << i << std::endl;
     }
