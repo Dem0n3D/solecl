@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 //    cout << "Enter N: ";
 //    cin >> N;
 
-    for(N = 100; N < 1000; N += 100) {
+    for(N = 100; N <= 2500; N += 100) {
         stringstream fname;
         fname << "matrix/matrix" << N << ".txt";
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         context->release();
     }
 
-    for(N = 1000; N < 10001; N += 1000) {
+    for(N = 3000; N < 10001; N += 1000) {
         stringstream fname;
         fname << "matrix/matrix" << N << ".txt";
 
