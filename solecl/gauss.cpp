@@ -66,20 +66,10 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
     QCLKernel gauss_f = program.createKernel("gauss_fwd");
     QCLKernel gauss_f2 = program.createKernel("gauss_fwd");
 
-    QCLKernel gauss_bp = program.createKernel("gauss_bwd_prepare");
+    QCLKernel gauss_b_pre = program.createKernel("gauss_bwd_prepare");
     QCLKernel gauss_b = program.createKernel("gauss_bwd");
 
-    int m = 192 * ((n+1) / 192);
-
-    gauss_f_pre.setGlobalWorkSize(1, n);
-    gauss_f.setGlobalWorkSize(m, n);
-    gauss_f2.setGlobalWorkSize((n+1) % 192, n);
-    gauss_f2.setGlobalWorkOffset(m, 0, 0);
-
-    gauss_f.setLocalWorkSize(192);
-
-    gauss_b.setGlobalWorkSize(1,n);
-    gauss_bp.setGlobalWorkSize(1,n);
+    gauss_b_pre.setGlobalWorkSize(1);
 
     QCLVector<float> xcl = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
 
@@ -88,9 +78,25 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
 
     for(int i = 0; i < n-1; i++)
     {
-        gauss_f_pre(buffA, n+1, i).waitForFinished();
-        gauss_f(buffA, n+1, i).waitForFinished();
-        gauss_f2(buffA, n+1, i).waitForFinished();
+        gauss_f_pre.setGlobalWorkSize(1, n-i-1);
+        gauss_f_pre(buffA, n+1, i);
+
+        if(n-i > 192) {
+            int m = 192 * ((n-i) / 192);
+            gauss_f.setGlobalWorkSize(m, n-i-1);
+            gauss_f.setLocalWorkSize(192);
+            gauss_f(buffA, n+1, i);
+
+            if((n-i) % 192) {
+                gauss_f2.setGlobalWorkSize((n-i) % 192, n);
+                gauss_f2.setGlobalWorkOffset(m, 0, 0);
+                gauss_f2(buffA, n+1, i);
+            }
+        } else {
+            gauss_f.setGlobalWorkSize(n-i, n-i-1);
+            gauss_f.setLocalWorkSize(n-i);
+            gauss_f(buffA, n+1, i);
+        }
 
         qDebug() << "cl fwd:" << i;
     }
@@ -106,8 +112,10 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
 
     for(int i = n-1; i >= 0; i--)
     {
-        gauss_bp(buffA, xcl, n+1, i).waitForFinished();
-        gauss_b(buffA, xcl, n+1, i).waitForFinished();
+        gauss_b_pre(buffA, xcl, n+1, i);
+
+        gauss_b.setGlobalWorkSize(1, i);
+        gauss_b(buffA, xcl, n+1, i);
 
         qDebug() << "cl bck:" << n-i;
     }
