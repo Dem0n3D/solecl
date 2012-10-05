@@ -63,6 +63,7 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
     program = context->buildProgramFromSourceFile(QLatin1String("cl/gauss.cl"));
 
     QCLKernel gauss_f_pre = program.createKernel("gauss_fwd_pre");
+
     QCLKernel gauss_f = program.createKernel("gauss_fwd");
     QCLKernel gauss_f2 = program.createKernel("gauss_fwd");
 
@@ -76,13 +77,32 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
     QTime t;
     t.start();
 
+    int m;
+
     for(int i = 0; i < n-1; i++)
     {
-        gauss_f_pre.setGlobalWorkSize(1, n-i-1);
-        gauss_f_pre(buffA, n+1, i);
+        if(n-i-1 > 192) {
+            m = 192 * ((n-i-1) / 192);
+            gauss_f_pre.setGlobalWorkSize(1, m);
+            gauss_f_pre.setGlobalWorkOffset(0, 0, 0);
+            gauss_f_pre.setLocalWorkSize(1, 192);
+            gauss_f_pre(buffA, n+1, i);
+
+            if((n-i-1) % 192) {
+                gauss_f_pre.setGlobalWorkSize(1, (n-i-1) % 192);
+                gauss_f_pre.setGlobalWorkOffset(0, m, 0);
+                gauss_f_pre.setLocalWorkSize(1);
+                gauss_f_pre(buffA, n+1, i);
+            }
+        } else {
+            gauss_f_pre.setGlobalWorkSize(1, n-i-1);
+            gauss_f_pre.setGlobalWorkOffset(0, 0, 0);
+            gauss_f_pre.setLocalWorkSize(1);
+            gauss_f_pre(buffA, n+1, i);
+        }
 
         if(n-i > 192) {
-            int m = 192 * ((n-i) / 192);
+            m = 192 * ((n-i) / 192);
             gauss_f.setGlobalWorkSize(m, n-i-1);
             gauss_f.setLocalWorkSize(192);
             gauss_f(buffA, n+1, i);
