@@ -19,16 +19,19 @@ SOURCES += main.cpp \
     gauss.cpp \
     jacobi.cpp \
     util.cpp \
-    zeidel.cpp
+    zeidel.cpp \
+    square.cpp
 
 HEADERS += \
     gauss.h \
     jacobi.h \
     util.h \
-    zeidel.h
+    zeidel.h \
+    square.h
 
 OTHER_FILES += \
     cl/gauss.cl \
     cl/jacobi.cl \
     cl/zeidel.cl \
-    cl/matrix.cl
+    cl/matrix.cl \
+    cl/square.cl

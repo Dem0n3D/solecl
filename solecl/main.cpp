@@ -11,6 +11,7 @@
 #include "gauss.h"
 #include "jacobi.h"
 #include "zeidel.h"
+#include "square.h"
 
 using namespace std;
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
-    t1 = Zeidel(AtA, N, x1, 0.001);
+    /*t1 = Zeidel(AtA, N, x1, 0.001);
     t2 = GaussCL(AtA, N, x2, context);
 
     float max = 0;
@@ -81,6 +82,22 @@ int main(int argc, char *argv[])
         }
         max = (max > fabs(AtA[i][N]-b)) ? max : fabs(AtA[i][N]-b);
     }
+
+    qDebug() << max;*/
+
+    QVector< QVector<float> > B(AtA);
+    Square(AtA, N);
+    SquareCL(B, N);
+
+    float max = 0;
+    for(int i = 0; i < N; i++) {
+        for(int j = i; j < N; j++) {
+            max = (fabs(AtA[i][j]-B[i][j]) > max) ? fabs(AtA[i][j]-B[i][j]) : max;
+        }
+    }
+
+    qDebug() << AtA ;
+    qDebug() << B ;
 
     qDebug() << max;
 }
