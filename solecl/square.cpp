@@ -14,7 +14,8 @@ int Square(const QVector< QVector<float> > &A, int n, QVector<float> &x)
         for(int k = 0; k < i; k++) {
             s -= U[k][i]*U[k][i];
         }
-        U[i][i] = sqrt(s);
+
+        U[i][i] = sqrt(fabs(s));
 
         for(int j = i+1; j < n; j++) {
             s = A[i][j];

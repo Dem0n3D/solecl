@@ -1,6 +1,6 @@
 kernel void square_fwd1(global float *A, int n, int i)
 {
-    A[i+i*n] = sqrt(A[i+i*n]);
+    A[i+i*n] = sqrt(fabs(A[i+i*n]));
 }
 
 kernel void square_fwd2(global float *A, int n, int i)

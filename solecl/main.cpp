@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 3000;
 
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
@@ -57,6 +57,6 @@ int main(int argc, char *argv[])
     t1 = SquareCL(AtA, N, x1, context);
     t2 = GaussCL(AtA, N, x2, context);
 
-    qDebug() << t1 << maxError(AtA, x1);
-    qDebug() << t2 << maxError(AtA, x2);
+    qDebug() << t1 << maxError(A, x1);
+    qDebug() << t2 << maxError(A, x2);
 }
