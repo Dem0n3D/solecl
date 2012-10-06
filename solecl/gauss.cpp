@@ -91,7 +91,7 @@ int GaussCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context, floa
             if((n-i-1) % 192) {
                 gauss_f_pre.setGlobalWorkSize(1, (n-i-1) % 192);
                 gauss_f_pre.setGlobalWorkOffset(0, m, 0);
-                gauss_f_pre.setLocalWorkSize(1);
+                gauss_f_pre.setLocalWorkSize(1, (n-i-1) % 192);
                 gauss_f_pre(buffA, n+1, i);
             }
         } else {

@@ -70,7 +70,6 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context)
     QCLKernel square_x2 = program.createKernel("square_x2");
 
     square_fwd1.setGlobalWorkSize(1);
-    square_fwd2.setGlobalWorkSize(n);
 
     square_y1.setGlobalWorkSize(1);
 
@@ -79,17 +78,39 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context)
     QTime t;
     t.start();
 
+    int m;
+
+    m = 192 * ((n) / 192);
+
     for(int i = 0; i < n; i++) {
         square_fwd1(buffA, n+1, i);
+
+        square_fwd2.setGlobalWorkSize(m);
+        square_fwd2.setGlobalWorkOffset(0, 0, 0);
+        square_fwd2.setLocalWorkSize(192);
         square_fwd2(buffA, n+1, i);
+
+        if(n % 192) {
+            square_fwd2.setGlobalWorkSize(n % 192);
+            square_fwd2.setGlobalWorkOffset(m, 0, 0);
+            square_fwd2.setLocalWorkSize(n % 192);
+            square_fwd2(buffA, n+1, i);
+        }
+
     }
 
     for(int i = 0; i < n; i++) {
         square_y1(buffA, xcl, n+1, i);
 
-        if(n-i-1 > 0) {
-            square_y2.setGlobalWorkSize(n-i-1);
-            square_y2.setGlobalWorkOffset(i+1, 0, 0);
+        square_y2.setGlobalWorkSize(m);
+        square_y2.setGlobalWorkOffset(0, 0, 0);
+        square_y2.setLocalWorkSize(192);
+        square_y2(buffA, xcl, n+1, i);
+
+        if(n % 192) {
+            square_y2.setGlobalWorkSize(n % 192);
+            square_y2.setGlobalWorkOffset(m, 0, 0);
+            square_y2.setLocalWorkSize(n % 192);
             square_y2(buffA, xcl, n+1, i);
         }
     }

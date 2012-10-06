@@ -33,7 +33,9 @@ kernel void square_y2(global float *U, global float *x, int n, int i)
 
     int k = get_global_id(0);
 
-    U[n-1+k*n] -= U[k+i*n] * y;
+    if(k > i) {
+        U[n-1+k*n] -= U[k+i*n] * y;
+    }
 }
 
 kernel void square_x1(global float *U, global float *x, int n, int i)
