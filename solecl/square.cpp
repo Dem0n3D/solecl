@@ -2,8 +2,12 @@
 
 #include "util.h"
 
-int Square(QVector< QVector<float> > &A, int n, QVector<float> &x) {
+int Square(const QVector< QVector<float> > &A, int n, QVector<float> &x)
+{
     QVector< QVector<float> > U(n, QVector<float>(n, 0));
+
+    QTime t;
+    t.start();
 
     for(int i = 0; i < n; i++) {
         float s = A[i][i];
@@ -38,9 +42,12 @@ int Square(QVector< QVector<float> > &A, int n, QVector<float> &x) {
         }
         x[i] /= U[i][i];
     }
+
+    return t.elapsed();
 }
 
-int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context) {
+int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context)
+{
     if(!context) {
         context = new QCLContext();
 
@@ -69,6 +76,9 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context) {
 
     QCLVector<float> xcl = context->createVector<float>(n, QCLMemoryObject::ReadWrite);
 
+    QTime t;
+    t.start();
+
     for(int i = 0; i < n; i++) {
         square_fwd1(buffA, n+1, i);
         square_fwd2(buffA, n+1, i);
@@ -94,9 +104,12 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context) {
     }
 
     xcl.read(x.data(), n);
+
+    return t.elapsed();
 }
 
-int SquareCL( QVector< QVector<float> > &A, int n, QVector<float> &x, QCLContext *context) {
+int SquareCL(const QVector< QVector<float> > &A, int n, QVector<float> &x, QCLContext *context)
+{
     if(!context) {
         context = new QCLContext();
 
