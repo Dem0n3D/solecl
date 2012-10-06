@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 1000;
+    N = 10;
 
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
@@ -85,19 +85,8 @@ int main(int argc, char *argv[])
 
     qDebug() << max;*/
 
-    QVector< QVector<float> > B(AtA);
-    Square(AtA, N);
-    SquareCL(B, N);
+    Square(AtA, N, x1);
+    SquareCL(AtA, N, x2);
 
-    float max = 0;
-    for(int i = 0; i < N; i++) {
-        for(int j = i; j < N; j++) {
-            max = (fabs(AtA[i][j]-B[i][j]) > max) ? fabs(AtA[i][j]-B[i][j]) : max;
-        }
-    }
-
-    qDebug() << AtA ;
-    qDebug() << B ;
-
-    qDebug() << max;
+    qDebug() << maxError(AtA, x1), maxError(AtA, x2);
 }

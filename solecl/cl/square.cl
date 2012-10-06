@@ -20,3 +20,18 @@ kernel void square_fwd2(global float *A, int n, int i)
         A[j+j*n] -= s*s;
     }
 }
+
+kernel void square_y1(global float *U, global float *x, int n, int i)
+{
+    x[i] = U[n-1+i*n] / U[i+i*n];
+}
+
+kernel void square_y2(global float *U, global float *x, int n, int i)
+{
+    local float y;
+    y = x[i];
+
+    int k = get_global_id(0);
+
+    U[n-1+k*n] -= U[k+i*n] * y;
+}

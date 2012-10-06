@@ -5,9 +5,9 @@
 
 #include <QVector>
 
-int Square(QVector< QVector<float> > &A, int n, float *x = NULL);
+int Square(QVector< QVector<float> > &A, int n, QVector<float> &x);
 
-int SquareCL(QCLBuffer buffA, int n, float *x = NULL, QCLContext *context = NULL);
-int SquareCL(QVector<QVector<float> > &A, int n, float *x = NULL, QCLContext *context = NULL);
+int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context = NULL);
+int SquareCL(QVector<QVector<float> > &A, int n, QVector<float> &x, QCLContext *context = NULL);
 
 #endif // SQUARE_H
