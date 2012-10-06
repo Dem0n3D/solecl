@@ -15,6 +15,8 @@ void outM(QVector< QVector<float> > M);
 float normMax(float *x1, float *x2, int n);
 float normMax(const QVector<float> &x1, const QVector<float> &x2);
 
+float maxError(const QVector< QVector<float> > &A, const QVector<float> &x);
+
 void matrix2CLBuff(const QVector< QVector<float> > &M, QCLBuffer buff);
 void CLBuff2matrix(QCLBuffer buff, QVector< QVector<float> > &M);
 

@@ -39,6 +39,19 @@ float normMax(const QVector<float> &x1, const QVector<float> &x2) // Норма-
     return max;
 }
 
+float maxError(const QVector< QVector<float> > &A, const QVector<float> &x) {
+    int N = A.size();
+    float max = 0;
+    for(int i = 0; i < N; i++) {
+        float b = 0;
+        for(int j = 0; j < N; j++) {
+            b += A[i][j]*x[j];
+        }
+        max = (max > fabs(A[i][N]-b)) ? max : fabs(A[i][N]-b);
+    }
+    return max;
+}
+
 void matrix2CLBuff(const QVector< QVector<float> > &M, QCLBuffer buff)
 {
     size_t n = M.size();
