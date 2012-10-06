@@ -88,5 +88,5 @@ int main(int argc, char *argv[])
     Square(AtA, N, x1);
     SquareCL(AtA, N, x2);
 
-    qDebug() << maxError(AtA, x1), maxError(AtA, x2);
+    qDebug() << maxError(AtA, x1) << maxError(AtA, x2);
 }

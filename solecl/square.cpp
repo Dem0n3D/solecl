@@ -59,6 +59,9 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context) {
     QCLKernel square_y1 = program.createKernel("square_y1");
     QCLKernel square_y2 = program.createKernel("square_y2");
 
+    QCLKernel square_x1 = program.createKernel("square_x1");
+    QCLKernel square_x2 = program.createKernel("square_x2");
+
     square_fwd1.setGlobalWorkSize(1);
     square_fwd2.setGlobalWorkSize(n);
 
@@ -81,9 +84,16 @@ int SquareCL(QCLBuffer buffA, int n, QVector<float> &x, QCLContext *context) {
         }
     }
 
-    xcl.read(x.data(), n);
+    for(int i = n-1; i >= 0; i--) {
+        square_x1(buffA, xcl, n+1, i);
 
-    qDebug() << x;
+        if(i > 0) {
+            square_x2.setGlobalWorkSize(i);
+            square_x2(buffA, xcl, n+1, i);
+        }
+    }
+
+    xcl.read(x.data(), n);
 }
 
 int SquareCL( QVector< QVector<float> > &A, int n, QVector<float> &x, QCLContext *context) {
