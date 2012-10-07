@@ -12,6 +12,7 @@
 #include "jacobi.h"
 #include "zeidel.h"
 #include "square.h"
+#include "rotation.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
     int N;
     //cout << "Enter N: ";
     //cin >> N;
-    N = 3000;
+    N = 1000;
 
     stringstream fname;
     fname << "matrix/matrix" << N << ".txt";
@@ -54,7 +55,7 @@ int main(int argc, char *argv[])
     QVector<float> x1(N, 0);
     QVector<float> x2(N, 0);
 
-    t1 = SquareCL(AtA, N, x1, context);
+    t1 = Rotation(AtA, N, x1);
     t2 = GaussCL(AtA, N, x2, context);
 
     qDebug() << t1 << maxError(A, x1);

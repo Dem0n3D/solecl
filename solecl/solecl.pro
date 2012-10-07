@@ -20,14 +20,16 @@ SOURCES += main.cpp \
     jacobi.cpp \
     util.cpp \
     zeidel.cpp \
-    square.cpp
+    square.cpp \
+    rotation.cpp
 
 HEADERS += \
     gauss.h \
     jacobi.h \
     util.h \
     zeidel.h \
-    square.h
+    square.h \
+    rotation.h
 
 OTHER_FILES += \
     cl/gauss.cl \
